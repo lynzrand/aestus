@@ -19,6 +19,11 @@ pub fn ABuffer::reserve(self : ABuffer, new_capacity : Int) -> Unit {
   }
   let old_data = self.data
   let new_data_len = old_data.length() * 3 / 2 + min_abuffer_len
+  let new_data_len = if new_data_len > new_capacity {
+    new_data_len
+  } else {
+    new_capacity
+  }
   let new_data = Bytes::make(new_data_len, init=(0).to_byte())
   new_data.blit(0, old_data, 0, self.len)
   self.data = new_data
