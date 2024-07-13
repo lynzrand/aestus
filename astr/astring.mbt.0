@@ -1,0 +1,82 @@
+/// An alternative userspace implementation of a String. The string supports multiple
+/// encodings, and is designed to be encoding agnostic. 
+/// 
+/// Note that performance is not guaranteed when using strings with different encodings together.
+struct AString {
+  buf : Bytes
+  encoding : Encoding
+  byte_length : Int
+}
+
+pub fn AString::from_string(s : String) -> AString {
+  let bytes = s.to_bytes()
+  { buf: bytes, encoding: Utf8, byte_length: bytes.length() }
+}
+
+pub fn AString::from_utf8_bytes(b : Bytes) -> AString {
+  { buf: b, encoding: Utf8, byte_length: b.length() }
+}
+
+pub fn AString::from_utf16_bytes(b : Bytes) -> AString {
+  { buf: b, encoding: Utf16, byte_length: b.length() }
+}
+
+pub fn AString::from_utf32_bytes(b : Bytes) -> AString {
+  { buf: b, encoding: Utf32, byte_length: b.length() }
+}
+
+fn AString::reencode(self : AString, new_encoding : Encoding) -> AString {
+  if self.encoding == new_encoding {
+    return self
+  }
+  let (new_bytes, new_len) = reencode_bytes(
+    self.buf,
+    self.byte_length,
+    self.encoding,
+    new_encoding,
+  )
+  { buf: new_bytes, encoding: new_encoding, byte_length: new_len }
+}
+
+pub fn AString::to_preferred_encoding(self : AString) -> AString {
+  self.reencode(preferred_encoding)
+}
+
+pub fn AString::cat(self : AString, other : AString) -> AString {
+  if self.encoding != other.encoding {
+    let new_other = other.reencode(self.encoding)
+    return self.cat(new_other)
+  }
+  let new_len = self.byte_length + other.byte_length
+  let new_buf = Bytes::make(new_len, 0)
+  new_buf.blit(0, self.buf, 0, self.byte_length)
+  new_buf.blit(self.byte_length, other.buf, 0, other.byte_length)
+  { buf: new_buf, encoding: self.encoding, byte_length: new_len }
+}
+
+pub fn AString::op_add(self : AString, other : AString) -> AString {
+  self.cat(other)
+}
+
+struct RuneIterator {
+  str : AString
+  mut curr_idx : Int
+}
+
+pub fn RuneIterator::next(self : RuneIterator) -> Char? {
+  if self.curr_idx == self.str.buf.length() {
+    return None
+  } else {
+    let (i, r) = read_rune_utf8(self.str.buf, self.curr_idx)
+    self.curr_idx += i
+    return Some(r)
+  }
+}
+
+struct Utf8View {
+  str : AString
+}
+
+struct Utf16View {
+  str : AString
+}
