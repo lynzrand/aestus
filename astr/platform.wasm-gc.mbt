@@ -1,1 +1,1 @@
-let preferred_encoding : Encoding = Utf8
+pub let preferred_encoding : @encoding.ByteEncoding = Utf8

@@ -1,1 +1,1 @@
-let preferred_encoding : Encoding = Utf16
+pub let preferred_encoding : Encoding = Utf16

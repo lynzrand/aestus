@@ -5,11 +5,7 @@ struct AStr {
 }
 
 pub fn AString::sub(self : AString, start : Int, end : Int) -> AStr? {
-  if start < 0 || end > self.buf.length() || start > end {
-    None
-  } else {
-    Some({ str: self, start, end })
-  }
+  abort("todo")
 }
 
 pub fn AStr::sub(self : AStr, start : Int, end : Int) -> AStr? {
