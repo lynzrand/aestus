@@ -85,7 +85,7 @@ fn read_rune_utf16be(buf : Bytes, idx : Int) -> (Int, Char)! {
     // convert to utf-16 codepoints
     let hi = b1.lsl(8).lor(b2)
     let lo = b3.lsl(8).lor(b4)
-    (4, combine_utf16_codepoints(hi, lo)!)
+    (4, combine_utf16_codepoints!(hi, lo))
   }
 }
 
@@ -108,7 +108,7 @@ fn read_rune_utf16le(buf : Bytes, idx : Int) -> (Int, Char)! {
     // convert to utf-16 codepoints
     let hi = b2.lsl(8).lor(b1)
     let lo = b4.lsl(8).lor(b3)
-    (4, combine_utf16_codepoints(hi, lo)!)
+    (4, combine_utf16_codepoints!(hi, lo))
   }
 }
 
@@ -142,45 +142,45 @@ fn read_rune_encoding(
   encoding : ByteEncoding
 ) -> (Int, Char)! {
   match encoding {
-    ByteEncoding::Utf8 => read_rune_utf8(buf, idx)!
-    ByteEncoding::Utf16BE => read_rune_utf16be(buf, idx)!
-    ByteEncoding::Utf16LE => read_rune_utf16le(buf, idx)!
-    ByteEncoding::Utf32BE => read_rune_utf32be(buf, idx)!
-    ByteEncoding::Utf32LE => read_rune_utf32le(buf, idx)!
+    ByteEncoding::Utf8 => read_rune_utf8!(buf, idx)
+    ByteEncoding::Utf16BE => read_rune_utf16be!(buf, idx)
+    ByteEncoding::Utf16LE => read_rune_utf16le!(buf, idx)
+    ByteEncoding::Utf32BE => read_rune_utf32be!(buf, idx)
+    ByteEncoding::Utf32LE => read_rune_utf32le!(buf, idx)
   }
 }
 
 // lossy
 fn read_rune_utf8_lossy(buf : Bytes, idx : Int) -> (Int, Char) {
-  match read_rune_utf8(buf, idx)!! {
+  match read_rune_utf8?(buf, idx) {
     Ok(v) => v
     Err(_) => (1, Char::from_int(0xFFFD))
   }
 }
 
 fn read_rune_utf16be_lossy(buf : Bytes, idx : Int) -> (Int, Char) {
-  match read_rune_utf16be(buf, idx)!! {
+  match read_rune_utf16be?(buf, idx) {
     Ok(v) => v
     Err(_) => (2, Char::from_int(0xFFFD))
   }
 }
 
 fn read_rune_utf16le_lossy(buf : Bytes, idx : Int) -> (Int, Char) {
-  match read_rune_utf16le(buf, idx)!! {
+  match read_rune_utf16le?(buf, idx) {
     Ok(v) => v
     Err(_) => (2, Char::from_int(0xFFFD))
   }
 }
 
 fn read_rune_utf32be_lossy(buf : Bytes, idx : Int) -> (Int, Char) {
-  match read_rune_utf32be(buf, idx)!! {
+  match read_rune_utf32be?(buf, idx) {
     Ok(v) => v
     Err(_) => (4, Char::from_int(0xFFFD))
   }
 }
 
 fn read_rune_utf32le_lossy(buf : Bytes, idx : Int) -> (Int, Char) {
-  match read_rune_utf32le(buf, idx)!! {
+  match read_rune_utf32le?(buf, idx) {
     Ok(v) => v
     Err(_) => (4, Char::from_int(0xFFFD))
   }
@@ -349,7 +349,7 @@ pub fn reencode_bytes(
   let mut src_idx = 0
   let mut dst_idx = 0
   while src_idx < src_len {
-    let (src_diff, r) = read_rune_encoding(s, src_idx, src_encoding)!
+    let (src_diff, r) = read_rune_encoding!(s, src_idx, src_encoding)
     src_idx += src_diff
     buf.reserve(dst_idx + max_char_len)
     let dst_diff = write_rune_encoding(buf.bytes(), dst_idx, r, dst_encoding)

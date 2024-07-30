@@ -6,7 +6,7 @@ struct ABuffer {
 let min_abuffer_len = 16
 
 pub fn ABuffer::make(capacity : Int) -> ABuffer {
-  { data: Bytes::make(capacity, init=(0).to_byte()), len: 0 }
+  { data: Bytes::new(capacity), len: 0 }
 }
 
 pub fn ABuffer::empty() -> ABuffer {
@@ -24,7 +24,7 @@ pub fn ABuffer::reserve(self : ABuffer, new_capacity : Int) -> Unit {
   } else {
     new_capacity
   }
-  let new_data = Bytes::make(new_data_len, init=(0).to_byte())
+  let new_data = Bytes::new(new_data_len)
   new_data.blit(0, old_data, 0, self.len)
   self.data = new_data
 }
