@@ -55,3 +55,13 @@ pub fn ABuffer::set_len(self : ABuffer, len : Int) -> Unit {
   }
   self.len = len
 }
+
+pub fn ABuffer::shrink_to_fit(self : ABuffer) -> Unit {
+  self.data = bytes_shrink_to_fit(self.data, self.len)
+}
+
+pub fn bytes_shrink_to_fit(bytes : Bytes, len : Int) -> Bytes {
+  let new_buf = Bytes::new(len)
+  new_buf.blit(0, bytes, 0, len)
+  new_buf
+}

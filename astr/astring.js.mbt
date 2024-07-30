@@ -1,0 +1,1 @@
+type AString String
